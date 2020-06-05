@@ -1,0 +1,3 @@
+[submodule "models/DeepPhotAstro"]
+	path = models/DeepPhotAstro
+	url = https://github.com/abinashsinha330/DeepPhotAstro
