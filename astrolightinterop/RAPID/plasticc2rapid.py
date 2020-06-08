@@ -5,14 +5,18 @@ import pandas as pd
 import logging
 
 class_map = {90: 1, 62: 2, 42: 3, 67: 4, 52: 5, 64: 6, 95: 7, 15: 8}
-class_names = ('Pre-explosion', 'SNIa-norm', 'SNIbc', 'SNII', 'SNIa-91bg', 'SNIa-x', 'Kilonova', 'SLSN-I', 'TDE')
+class_names = (
+    'Pre-explosion', 'SNIa-norm', 'SNIbc', 'SNII', 'SNIa-91bg', 'SNIa-x', 'Kilonova', 'SLSN-I',
+    'TDE')
 
-# passband: The specific LSST passband integer, such that u, g, r, i, z, Y = 0, 1, 2, 3, 4, 5 in which it was viewed.
+# passband: The specific LSST passband integer, such that u, g, r, i, z, Y = 0, 1, 2, 3, 4, 5
+# in which it was viewed.
 band_map = {0: 'u', 1: 'g', 2: 'r', 3: 'i', 4: 'z', 5: 'Y'}
 logger = logging.getLogger(__name__)
 
 
-def _remap_class_values(metadata: pd.DataFrame, curves: pd.DataFrame, classes=None) -> (pd.DataFrame, pd.DataFrame):
+def _remap_class_values(metadata: pd.DataFrame, curves: pd.DataFrame, classes=None) -> (
+        pd.DataFrame, pd.DataFrame):
     """
     Maps class values and removes unused classes from the dataset.
 
@@ -71,13 +75,15 @@ def _calculate_triggers(curve: pd.DataFrame) -> pd.DataFrame:
     return curve
 
 
-def convert(curves: pd.DataFrame, metadata: pd.DataFrame, bands: dict = None, classes: dict = None) -> (list, list):
+def convert(curves: pd.DataFrame, metadata: pd.DataFrame, bands: dict = None,
+            classes: dict = None) -> (list, list):
     """
     Converts the PLAsTiCC dataset into a set that RAPID can use natively.
 
-    :param classes: The class map to use. This will specify what classes are included and their new values.
-        TODO: create examples for this. It's confusing.
-    :param bands: The band mapping to use. Bands not specified will be removed from the returned lists.
+    :param classes: The class map to use. This will specify what classes are included and their new
+        values.
+    :param bands: The band mapping to use. Bands not specified will be removed from the returned
+        lists.
     :param metadata: The curves from PLAsTiCC
     :param curves: The light curve data from PLAsTiCC
     :returns light_list: a list of light curve tuples that RAPID takes as input
@@ -96,8 +102,10 @@ def convert(curves: pd.DataFrame, metadata: pd.DataFrame, bands: dict = None, cl
         curve = curves.loc[meta.Index]
         curve = _calculate_triggers(curve)
         light_list.append((
-            curve.index.to_list(), curve['flux'].to_list(), curve['flux_err'].to_list(), curve['passband'].to_list(),
-            curve['detected'].to_list(), meta.ra, meta.decl, meta.Index, meta.hostgal_specz, meta.mwebv))
+            curve.index.to_list(), curve['flux'].to_list(), curve['flux_err'].to_list(),
+            curve['passband'].to_list(),
+            curve['detected'].to_list(), meta.ra, meta.decl, meta.Index, meta.hostgal_specz,
+            meta.mwebv))
         target_list.append(int(meta.target - 1))
 
     logger.info("Done processing light curves.")

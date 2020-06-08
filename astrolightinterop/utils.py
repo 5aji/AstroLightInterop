@@ -10,7 +10,8 @@ def print_test_results(target_list: list[int], predictions_list, use_probabiliti
     :param predictions_list: The list of predicted classes.
     """
     if use_probabilities:
-        # The number of classes in the target list should be equal to the length of the probability vector in pred_list
+        # The number of classes in the target list should be equal to the length of the probability
+        # vector in pred_list
         assert len(np.unique(target_list)) == len(predictions_list[0][0])
 
 

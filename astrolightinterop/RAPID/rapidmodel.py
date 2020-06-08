@@ -11,7 +11,9 @@ import astrolightinterop.RAPID.plasticc2rapid as p2r
 
 logger = logging.getLogger(__name__)
 # API standards
-class_names = ('Pre-explosion', 'SNIa-norm', 'SNIbc', 'SNII', 'SNIa-91bg', 'SNIa-x', 'Kilonova', 'SLSN-I', 'TDE')
+class_names = (
+    'Pre-explosion', 'SNIa-norm', 'SNIbc', 'SNII', 'SNIa-91bg', 'SNIa-x', 'Kilonova', 'SLSN-I',
+    'TDE')
 
 
 class Model:
@@ -41,7 +43,8 @@ class Model:
         self._curves = curves
         self._metadata = metadata
 
-    def _get_custom_data(self, class_num, data_dir, save_dir, passbands, known_redshift, nprocesses, redo):
+    def _get_custom_data(self, class_num, data_dir, save_dir, passbands, known_redshift, nprocesses,
+                         redo):
         light_list, target_list = p2r.convert(self._curves, self._metadata)
         # now we need to preprocess
         return read_multiple_light_curves(light_list)
@@ -52,8 +55,10 @@ class Model:
 
     def test(self, return_probabilities: bool = False) -> (list, list):
         """
-        :param return_probabilities: If the function should return the raw probabilities (and not just the most likely)
-        :return: a tuple of lists, one containing the target class and the other containing the output of the classifier
+        :param:   return_probabilities: If the function should return the raw probabilities (and not
+        just the most likely)
+        :return: a tuple of lists, one containing the target class and the
+        other containing the output of the classifier
         """
         logger.info("testing model")
         light_list, target_list = p2r.convert(self._curves, self._metadata)
