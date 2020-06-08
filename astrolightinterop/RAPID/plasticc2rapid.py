@@ -60,14 +60,11 @@ def _calculate_triggers(curve: pd.DataFrame) -> pd.DataFrame:
     """
     # map the detected column values (0,1) to the expected photflag values (0,4096, 6144)
     curve['detected'] = curve['detected'].map({0: 0, 1: 4096})
-
     # get the triggerpoint.
     # we are assuming that it is mjd sorted. (it should be)
     first_detect_index = curve['detected'].idxmax()
     # idxmax returns the index of the first occurrence of the max value
     # which in this case is the first occurance of 4096.
-    # if curve.at[first_detect_index, 'detected'] == 4096:
-    # we don't want to overwrite a non-detect frame
     curve.at[first_detect_index, 'detected'] = 6144
     return curve
 
