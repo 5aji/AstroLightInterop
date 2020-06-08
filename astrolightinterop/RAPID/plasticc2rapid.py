@@ -10,21 +10,23 @@ class_names = ('Pre-explosion', 'SNIa-norm', 'SNIbc', 'SNII', 'SNIa-91bg', 'SNIa
 logger = logging.getLogger(__name__)
 
 
-def _remap_class_values(metadata: pd.DataFrame, curves: pd.DataFrame, class_map: dict) -> (pd.DataFrame, pd.DataFrame):
+def _remap_class_values(metadata: pd.DataFrame, curves: pd.DataFrame, classes=None) -> (pd.DataFrame, pd.DataFrame):
     """
     Maps class values and removes unused classes from the dataset.
 
-    :param class_map: The dictionary to use for mapping in {orig:result} form.
-    :param metadata: The metadata to remap targets.
-    :param curves: The curve data associated with the metadata.
+    :param classes: The dictionary to use for mapping in {orig:result} form.
+    :param metadata: The curves to remap targets.
+    :param curves: The curve data associated with the curves.
     """
 
+    if classes is None:
+        classes = class_map
     logger.info("remap ping class values")
     start = time.process_time()
     # remap target class numbers to match output of RAPID.
     # Change this to change what each class maps to.
-    metadata = metadata[metadata['target'].isin(class_map.keys())]
-    metadata.loc[:, 'target'] = metadata.loc[:, 'target'].map(class_map)
+    metadata = metadata[metadata['target'].isin(classes.keys())]
+    metadata.loc[:, 'target'] = metadata.loc[:, 'target'].map(classes)
     curves = curves[curves.index.isin(metadata.index, level=0)]
     logger.info("classes remapped in {0}".format(time.process_time() - start))
     return metadata, curves
