@@ -3,10 +3,14 @@
 import time
 import pandas as pd
 import logging
+
 class_map = {90: 1, 62: 2, 42: 3, 67: 4, 52: 5, 64: 6, 95: 7, 15: 8}
+class_names = ('Pre-explosion', 'SNIa-norm', 'SNIbc', 'SNII', 'SNIa-91bg', 'SNIa-x', 'Kilonova', 'SLSN-I', 'TDE')
 
 logger = logging.getLogger(__name__)
-def remap_class_values(metadata: pd.DataFrame, curves: pd.DataFrame, class_map: dict) -> (pd.DataFrame, pd.DataFrame):
+
+
+def _remap_class_values(metadata: pd.DataFrame, curves: pd.DataFrame, class_map: dict) -> (pd.DataFrame, pd.DataFrame):
     """
     Maps class values and removes unused classes from the dataset.
 
@@ -26,7 +30,7 @@ def remap_class_values(metadata: pd.DataFrame, curves: pd.DataFrame, class_map: 
     return metadata, curves
 
 
-def remove_unused_bands(curves: pd.DataFrame) -> pd.DataFrame:
+def _remove_unused_bands(curves: pd.DataFrame) -> pd.DataFrame:
     logger.info("removing unused bands")
     start = time.process_time()
     # filter unused bands
@@ -38,7 +42,7 @@ def remove_unused_bands(curves: pd.DataFrame) -> pd.DataFrame:
     return curves
 
 
-def calculate_triggers(curve: pd.DataFrame) -> pd.DataFrame:
+def _calculate_triggers(curve: pd.DataFrame) -> pd.DataFrame:
     """
     Modify the curve (A dataframe) to have the correct triggering.
 
@@ -63,25 +67,23 @@ def plasticc_to_rapid(metadata: pd.DataFrame, curves: pd.DataFrame) -> (list, li
     """
     Converts the PLAsTiCC dataset into a set that RAPID can use natively.
 
-    :param print_stats: boolean if stats about the data should be printed.
     :param metadata: The metadata from PLAsTiCC
     :param curves: The light curve data from PLAsTiCC
     :returns light_list: a list of light curve tuples that RAPID takes as input
     :returns target_list: A list containing the matching targets from the dataset.
     """
-    curves = remove_unused_bands(curves)
-    metadata, curves = remap_class_values(metadata, curves, class_map)
+    curves = _remove_unused_bands(curves)
+    metadata, curves = _remap_class_values(metadata, curves, class_map)
 
     light_list = []
     target_list = []
     for meta in metadata.sample(frac=0.75).itertuples():
         curve = curves.loc[meta.Index]
-        curve = calculate_triggers(curve)
+        curve = _calculate_triggers(curve)
         light_list.append((
             curve.index.to_list(), curve['flux'].to_list(), curve['flux_err'].to_list(), curve['passband'].to_list(),
             curve['detected'].to_list(), meta.ra, meta.decl, meta.Index, meta.hostgal_specz, meta.mwebv))
         target_list.append(int(meta.target - 1))
-
 
     logger.info("Done processing light curves.")
     return light_list, target_list
