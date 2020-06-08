@@ -71,21 +71,28 @@ def _calculate_triggers(curve: pd.DataFrame) -> pd.DataFrame:
     return curve
 
 
-def convert(metadata: pd.DataFrame, curves: pd.DataFrame) -> (list, list):
+def convert(curves: pd.DataFrame, metadata: pd.DataFrame, bands: dict = None, classes: dict = None) -> (list, list):
     """
     Converts the PLAsTiCC dataset into a set that RAPID can use natively.
 
-    :param metadata: The metadata from PLAsTiCC
+    :param classes: The class map to use. This will specify what classes are included and their new values.
+        TODO: create examples for this. It's confusing.
+    :param bands: The band mapping to use. Bands not specified will be removed from the returned lists.
+    :param metadata: The curves from PLAsTiCC
     :param curves: The light curve data from PLAsTiCC
     :returns light_list: a list of light curve tuples that RAPID takes as input
     :returns target_list: A list containing the matching targets from the dataset.
     """
-    curves = _remove_unused_bands(curves)
-    metadata, curves = _remap_class_values(metadata, curves, class_map)
+    if bands is None:
+        bands = {1: 'g', 2: 'r'}
+    if classes is None:
+        classes = class_map
+    curves = _remove_unused_bands(curves, bands)
+    metadata, curves = _remap_class_values(metadata, curves, classes)
 
     light_list = []
     target_list = []
-    for meta in metadata.sample(frac=0.75).itertuples():
+    for meta in metadata.itertuples():
         curve = curves.loc[meta.Index]
         curve = _calculate_triggers(curve)
         light_list.append((
