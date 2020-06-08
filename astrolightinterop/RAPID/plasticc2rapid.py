@@ -63,7 +63,7 @@ def _calculate_triggers(curve: pd.DataFrame) -> pd.DataFrame:
     return curve
 
 
-def plasticc_to_rapid(metadata: pd.DataFrame, curves: pd.DataFrame) -> (list, list):
+def convert(metadata: pd.DataFrame, curves: pd.DataFrame) -> (list, list):
     """
     Converts the PLAsTiCC dataset into a set that RAPID can use natively.
 
