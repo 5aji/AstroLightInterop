@@ -17,12 +17,32 @@ logger = logging.getLogger(__name__)
 
 def _remap_class_values(metadata: pd.DataFrame, curves: pd.DataFrame, classes=None) -> (
         pd.DataFrame, pd.DataFrame):
-    """
-    Maps class values and removes unused classes from the dataset.
+    """Maps class values and removes unused classes from the dataset.
 
-    :param classes: The dictionary to use for mapping in {orig:result} form.
-    :param metadata: The curves to remap targets.
-    :param curves: The curve data associated with the curves.
+    Parameters
+    ----------
+    classes :
+        The dictionary to use for mapping in {orig:result} form. (Default value = None) -> (pd.DataFrame)
+    metadata :
+        The curves to remap targets.
+    curves :
+        The curve data associated with the curves.
+    metadata :
+        pd.DataFrame:
+    curves :
+        pd.DataFrame:
+    pd :
+        DataFrame:
+    metadata: pd.DataFrame :
+        
+    curves: pd.DataFrame :
+        
+    pd.DataFrame :
+        
+
+    Returns
+    -------
+
     """
 
     if classes is None:
@@ -39,11 +59,24 @@ def _remap_class_values(metadata: pd.DataFrame, curves: pd.DataFrame, classes=No
 
 
 def _remove_unused_bands(curves: pd.DataFrame, bands: dict = None) -> pd.DataFrame:
-    """
-    Removes unused bands and maps band ints to their string representation for RAPID.
-    :param curves:
-    :param bands:
-    :return:
+    """Removes unused bands and maps band ints to their string representation for RAPID.
+
+    Parameters
+    ----------
+    curves :
+        param bands:
+    curves :
+        pd.DataFrame:
+    bands :
+        dict:  (Default value = None)
+    curves: pd.DataFrame :
+        
+    bands: dict :
+         (Default value = None)
+
+    Returns
+    -------
+
     """
     if bands is None:
         bands = {1: 'g', 2: 'r'}
@@ -58,11 +91,21 @@ def _remove_unused_bands(curves: pd.DataFrame, bands: dict = None) -> pd.DataFra
 
 
 def _calculate_triggers(curve: pd.DataFrame) -> pd.DataFrame:
-    """
-    Modify the curve (A dataframe) to have the correct triggering.
+    """Modify the curve (A dataframe) to have the correct triggering.
 
-    :param curve: The curve to find the trigger frame for
-    :return curve: The modified curve with first-detect triggering.
+    Parameters
+    ----------
+    curve :
+        The curve to find the trigger frame for
+        :return curve: The modified curve with first-detect triggering.
+    curve :
+        pd.DataFrame:
+    curve: pd.DataFrame :
+        
+
+    Returns
+    -------
+
     """
     # map the detected column values (0,1) to the expected photflag values (0,4096, 6144)
     curve['detected'] = curve['detected'].map({0: 0, 1: 4096})
@@ -77,17 +120,44 @@ def _calculate_triggers(curve: pd.DataFrame) -> pd.DataFrame:
 
 def convert(curves: pd.DataFrame, metadata: pd.DataFrame, bands: dict = None,
             classes: dict = None) -> (list, list):
-    """
-    Converts the PLAsTiCC dataset into a set that RAPID can use natively.
+    """Converts the PLAsTiCC dataset into a set that RAPID can use natively.
 
-    :param classes: The class map to use. This will specify what classes are included and their new
+    Parameters
+    ----------
+    classes :
+        The class map to use. This will specify what classes are included and their new
         values.
-    :param bands: The band mapping to use. Bands not specified will be removed from the returned
+    bands :
+        The band mapping to use. Bands not specified will be removed from the returned
         lists.
-    :param metadata: The curves from PLAsTiCC
-    :param curves: The light curve data from PLAsTiCC
-    :returns light_list: a list of light curve tuples that RAPID takes as input
-    :returns target_list: A list containing the matching targets from the dataset.
+    metadata :
+        The curves from PLAsTiCC
+    curves :
+        The light curve data from PLAsTiCC
+    curves :
+        pd.DataFrame:
+    metadata :
+        pd.DataFrame:
+    bands :
+        dict:  (Default value = None)
+    classes :
+        dict:  (Default value = None) -> (list)
+    list :
+        returns: light_list: a list of light curve tuples that RAPID takes as input
+    curves: pd.DataFrame :
+        
+    metadata: pd.DataFrame :
+        
+    bands: dict :
+         (Default value = None)
+    classes: dict :
+         (Default value = None) -> (list)
+
+    Returns
+    -------
+    type
+        light_list: a list of light curve tuples that RAPID takes as input
+
     """
     if bands is None:
         bands = {1: 'g', 2: 'r'}

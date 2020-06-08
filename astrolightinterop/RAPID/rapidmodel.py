@@ -1,4 +1,6 @@
-# Import the dataset.
+"""
+
+"""
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,8 +18,18 @@ class_names = (
     'TDE')
 
 
-class Model:
+class RAPIDModel:
+    """Wrapper for the model outlined by the RAPID paper (Muthukrishna et al 2019)"""
     def __init__(self, curves: pd.DataFrame, metadata: pd.DataFrame, model: str = None):
+        """
+
+        Parameters
+        ----------
+        curves: pd.Dataframe
+
+        metadata
+        model
+        """
         if model is not None:
             self.classifier = Classify(known_redshift=True, model_filepath=model)
         else:
@@ -29,15 +41,51 @@ class Model:
             print("missing a filetype")
             raise NameError
 
-    def set_metadata(self, metadata: str):
+    def set_metadata(self, metadata: pd.DataFrame):
+        """Sets the loaded
+
+        Parameters
+        ----------
+        metadata: pd.DataFrame :
+            
+
+        Returns
+        -------
+
+        
+        """
         assert isinstance(metadata, pd.DataFrame)
         self._metadata = metadata
 
     def set_curves(self, curves: pd.DataFrame):
+        """
+
+        Parameters
+        ----------
+        curves: pd.DataFrame :
+            
+
+        Returns
+        -------
+
+        """
         assert isinstance(curves, pd.DataFrame)
         self._curves = curves
 
     def set_data(self, curves: pd.DataFrame, metadata: pd.DataFrame):
+        """
+
+        Parameters
+        ----------
+        curves: pd.DataFrame :
+            
+        metadata: pd.DataFrame :
+            
+
+        Returns
+        -------
+
+        """
         assert isinstance(curves, pd.DataFrame)
         assert isinstance(metadata, pd.DataFrame)
         self._curves = curves
@@ -45,20 +93,54 @@ class Model:
 
     def _get_custom_data(self, class_num, data_dir, save_dir, passbands, known_redshift, nprocesses,
                          redo):
+        """
+
+        Parameters
+        ----------
+        class_num :
+            
+        data_dir :
+            
+        save_dir :
+            
+        passbands :
+            
+        known_redshift :
+            
+        nprocesses :
+            
+        redo :
+            
+
+        Returns
+        -------
+
+        """
         light_list, target_list = p2r.convert(self._curves, self._metadata)
         # now we need to preprocess
         return read_multiple_light_curves(light_list)
 
     def train(self):
+        """ """
         # we need to create a new model
         pass
 
     def test(self, return_probabilities: bool = False) -> (list, list):
-        """
-        :param:   return_probabilities: If the function should return the raw probabilities (and not
-        just the most likely)
-        :return: a tuple of lists, one containing the target class and the
-        other containing the output of the classifier
+        """Tests the model on the currently loaded data.
+
+        Parameters
+        ----------
+        return_probabilities : bool, optional
+            If the predictions should be a probability of arrays as opposed to the most likely class
+        return_probabilities: bool :
+             (Default value = False) -> (list)
+        list :
+            
+
+        Returns
+        -------
+
+        
         """
         logger.info("testing model")
         light_list, target_list = p2r.convert(self._curves, self._metadata)
