@@ -30,5 +30,6 @@ These serve as a standard way to evaluate different models.
 | SuperNNova | planned | planned |
 
 #### Usage
-All models take PLAsTiCC-formatted data as their input
-TODO
+All models take PLAsTiCC-formatted data as their input.
+
+
