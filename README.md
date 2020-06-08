@@ -8,14 +8,13 @@ Consists of `data converters` and `model interfaces`
 
 These modify datasets to fit a different format for other models.
 
+| Input      | RAPID format | PLAsTiCC format | SuperNNova Format |
+|------------|--------------|-----------------| ----------------- |
+| PLAsTiCC   | yes          | ---             | planned |
+| SPCC       | via PLAsTiCC | planned         | via PLAsTiCC |
+| SuperNNova | via PLAsTiCC | planned         | via PLAsTiCC |
+|          |              |                 |
 
-
-| Input      | RAPID format | PLAsTiCC format |
-|------------|--------------|-----------------|
-| PLAsTiCC   | yes          | ---             |
-| SPCC       | via PLAsTiCC | planned         |
-| SuperNNova | via PLAsTiCC | planned         |
-|            |              |                 |
 #### Usage
 TODO
 
@@ -28,6 +27,7 @@ These serve as a standard way to evaluate different models.
 | RAPID | yes | in progress |
 | AVOCADO | planned | planned |
 | SuperNNova | planned | planned |
+| DeepPhotAstro | planned | planned |
 
 #### Usage
 All models take PLAsTiCC-formatted data as their input.
