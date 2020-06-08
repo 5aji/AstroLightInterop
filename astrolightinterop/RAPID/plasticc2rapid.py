@@ -30,14 +30,21 @@ def _remap_class_values(metadata: pd.DataFrame, curves: pd.DataFrame, class_map:
     return metadata, curves
 
 
-def _remove_unused_bands(curves: pd.DataFrame) -> pd.DataFrame:
+def _remove_unused_bands(curves: pd.DataFrame, bands: dict = None) -> pd.DataFrame:
+    """
+    Removes unused bands and maps band ints to their string representation for RAPID.
+    :param curves:
+    :param bands:
+    :return:
+    """
+    if bands is None:
+        bands = {1: 'g', 2: 'r'}
     logger.info("removing unused bands")
     start = time.process_time()
     # filter unused bands
-    curves = curves[curves['passband'].isin([1, 2])]  # 1 and 2 are rgb bands.
+    curves = curves[curves['passband'].isin(bands.keys())]  # 1 and 2 are rgb bands.
     # FIXME: use loc instead of chain?
-    curves.loc[:, 'passband'] = curves.loc[:, 'passband'].map({1: 'g', 2: 'r'})
-    logger.info(curves)
+    curves.loc[:, 'passband'] = curves.loc[:, 'passband'].map(bands)
     logger.info("unused bands removed in {0}".format(time.process_time() - start))
     return curves
 
