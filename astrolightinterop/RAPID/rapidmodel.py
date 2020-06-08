@@ -44,7 +44,7 @@ class Model:
         # we need to create a new model
         pass
 
-    def test(self, return_probabilities: bool = False) -> tuple[list, list]:
+    def test(self, return_probabilities: bool = False) -> (list, list):
         """
         :param return_probabilities: If the function should return the raw probabilities (and not just the most likely)
         :return: a tuple of lists, one containing the target class and the other containing the output of the classifier
