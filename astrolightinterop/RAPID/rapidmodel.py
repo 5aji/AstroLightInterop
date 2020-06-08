@@ -15,28 +15,34 @@ class_names = ('Pre-explosion', 'SNIa-norm', 'SNIbc', 'SNII', 'SNIa-91bg', 'SNIa
 
 
 class Model:
-    def __init__(self, curvefile: str, metafile: str, model: str):
-        if model:
+    def __init__(self, curves: pd.DataFrame, metadata: pd.DataFrame, model: str = None):
+        if model is not None:
             self.classifier = Classify(known_redshift=True, model_filepath=model)
         else:
             self.classifier = Classify(known_redshift=True)
         try:
-            self._curvefile = curvefile
-            self._metafile = metafile
+            self._curves = curves
+            self._metadata = metadata
         except NameError:
             print("missing a filetype")
             raise NameError
 
-    def set_metafile(self, metafile: str):
-        self._metafile = metafile
+    def set_metadata(self, metadata: str):
+        assert isinstance(metadata, pd.DataFrame)
+        self._metadata = metadata
 
-    def set_curvefile(self, curvefile: str):
-        self._curvefile = curvefile
+    def set_curves(self, curves: pd.DataFrame):
+        assert isinstance(curves, pd.DataFrame)
+        self._curves = curves
+
+    def set_data(self, curves: pd.DataFrame, metadata: pd.DataFrame):
+        assert isinstance(curves, pd.DataFrame)
+        assert isinstance(metadata, pd.DataFrame)
+        self._curves = curves
+        self._metadata = metadata
 
     def _get_custom_data(self, class_num, data_dir, save_dir, passbands, known_redshift, nprocesses, redo):
-        curvedata = pd.read_csv(self._curvefile, index_col=['object_id', 'mjd'])
-        metadata = pd.read_csv(self._metafile, index_col='object_id')
-        light_list, target_list = p2r.convert(metadata, curvedata)
+        light_list, target_list = p2r.convert(self._curves, self._metadata)
         # now we need to preprocess
         return read_multiple_light_curves(light_list)
 
@@ -50,9 +56,7 @@ class Model:
         :return: a tuple of lists, one containing the target class and the other containing the output of the classifier
         """
         logger.info("testing model")
-        curvedata = pd.read_csv(self._curvefile, index_col=['object_id', 'mjd'])
-        metadata = pd.read_csv(self._metafile, index_col='object_id')
-        light_list, target_list = p2r.convert(metadata, curvedata)
+        light_list, target_list = p2r.convert(self._curves, self._metadata)
         predictions, steps = self.classifier.get_predictions(light_list)
         assert len(target_list) == len(predictions)
         target_list = np.add(target_list, 1)
