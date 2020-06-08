@@ -7,6 +7,8 @@ import logging
 class_map = {90: 1, 62: 2, 42: 3, 67: 4, 52: 5, 64: 6, 95: 7, 15: 8}
 class_names = ('Pre-explosion', 'SNIa-norm', 'SNIbc', 'SNII', 'SNIa-91bg', 'SNIa-x', 'Kilonova', 'SLSN-I', 'TDE')
 
+# passband: The specific LSST passband integer, such that u, g, r, i, z, Y = 0, 1, 2, 3, 4, 5 in which it was viewed.
+band_map = {0: 'u', 1: 'g', 2: 'r', 3: 'i', 4: 'z', 5: 'Y'}
 logger = logging.getLogger(__name__)
 
 
