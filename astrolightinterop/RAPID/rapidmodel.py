@@ -1,4 +1,6 @@
-"""
+"""Wrapper Module for RAPID
+
+Follows the generic model API including train/test and init functions.
 
 """
 import pandas as pd
