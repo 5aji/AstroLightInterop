@@ -30,6 +30,9 @@ These serve as a standard way to evaluate different models.
 | DeepPhotAstro | planned | planned |
 
 #### Usage
-All models take PLAsTiCC-formatted data as their input.
+All models take PLAsTiCC-formatted data as their input. They will automatically use the required
+ data converter to transform the data into a format accepted by the model. They will then expose
+  methods to train and test the model on the provided datasets.
+  
 
 
