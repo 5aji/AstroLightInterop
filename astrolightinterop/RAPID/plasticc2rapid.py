@@ -126,11 +126,10 @@ def convert(curves: pd.DataFrame, metadata: pd.DataFrame, bands: dict = None,
 
     Returns
     -------
-    list
-        a list of light curve tuples that RAPID takes as input
-    list
-        a list of true classes for each curve.
-
+    light_list : list
+        A list of light curve tuples in the format RAPID accepts.
+    target_list : list
+        A list of the true classes for each of the curves.
     """
     if classes is None:
         classes = class_map
