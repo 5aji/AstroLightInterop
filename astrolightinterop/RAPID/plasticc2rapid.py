@@ -15,34 +15,25 @@ band_map = {0: 'u', 1: 'g', 2: 'r', 3: 'i', 4: 'z', 5: 'Y'}
 logger = logging.getLogger(__name__)
 
 
-def _remap_class_values(metadata: pd.DataFrame, curves: pd.DataFrame, classes=None) -> (
-        pd.DataFrame, pd.DataFrame):
+def _remap_class_values(metadata: pd.DataFrame, curves: pd.DataFrame, classes=None) -> \
+        (pd.DataFrame, pd.DataFrame):
     """Maps class values and removes unused classes from the dataset.
 
     Parameters
     ----------
-    classes :
-        The dictionary to use for mapping in {orig:result} form. (Default value = None) -> (pd.DataFrame)
-    metadata :
-        The curves to remap targets.
-    curves :
-        The curve data associated with the curves.
-    metadata :
-        pd.DataFrame:
-    curves :
-        pd.DataFrame:
-    pd :
-        DataFrame:
-    metadata: pd.DataFrame :
-        
-    curves: pd.DataFrame :
-        
-    pd.DataFrame :
-        
+    classes : dict, optional
+        The dictionary to use for mapping in {orig:result} form.
+    metadata : pd.DataFrame
+       The metadata associated with the curve
+    curves : pd.DataFrame
+        The curve data associated with each transient.
 
     Returns
     -------
-
+    metadata : pd.DataFrame
+        The filtered metadata with unneeded classes removed and class numbers remapped.
+    curves : pd.DataFrame
+        The filtered curves with unneeded classes removed.
     """
 
     if classes is None:
@@ -63,27 +54,23 @@ def _remove_unused_bands(curves: pd.DataFrame, bands: dict = None) -> pd.DataFra
 
     Parameters
     ----------
-    curves :
-        param bands:
-    curves :
-        pd.DataFrame:
-    bands :
-        dict:  (Default value = None)
-    curves: pd.DataFrame :
-        
-    bands: dict :
-         (Default value = None)
+    curves : pd.DataFrame
+        The curve data associated with each transient.
+    bands : dict, optional
+        The bands that should be and their new mapping.
+        Default is {1: 'g', 2: 'r'}
 
     Returns
     -------
-
+    pd.DataFrame
+        Light transient data without the unused bands.
     """
     if bands is None:
         bands = {1: 'g', 2: 'r'}
     logger.info("removing unused bands")
     start = time.process_time()
     # filter unused bands
-    curves = curves[curves['passband'].isin(bands.keys())]  # 1 and 2 are rgb bands.
+    curves = curves.loc[curves['passband'].isin(list(bands.keys()))]
     # FIXME: use loc instead of chain?
     curves.loc[:, 'passband'] = curves.loc[:, 'passband'].map(bands)
     logger.info("unused bands removed in {0}".format(time.process_time() - start))
@@ -91,21 +78,17 @@ def _remove_unused_bands(curves: pd.DataFrame, bands: dict = None) -> pd.DataFra
 
 
 def _calculate_triggers(curve: pd.DataFrame) -> pd.DataFrame:
-    """Modify the curve (A dataframe) to have the correct triggering.
+    """Modify the curve to have correct triggering.
 
     Parameters
     ----------
-    curve :
+    curve : pd.DataFrame
         The curve to find the trigger frame for
-        :return curve: The modified curve with first-detect triggering.
-    curve :
-        pd.DataFrame:
-    curve: pd.DataFrame :
-        
 
     Returns
     -------
-
+    pd.DataFrame
+        The modified curve with first-detect triggering.
     """
     # map the detected column values (0,1) to the expected photflag values (0,4096, 6144)
     curve['detected'] = curve['detected'].map({0: 0, 1: 4096})
@@ -119,48 +102,29 @@ def _calculate_triggers(curve: pd.DataFrame) -> pd.DataFrame:
 
 
 def convert(curves: pd.DataFrame, metadata: pd.DataFrame, bands: dict = None,
-            classes: dict = None) -> (list, list):
+            classes: dict = None):
     """Converts the PLAsTiCC dataset into a set that RAPID can use natively.
 
     Parameters
     ----------
-    classes :
+    classes : dict, optional
         The class map to use. This will specify what classes are included and their new
         values.
-    bands :
+    bands : dict, optional
         The band mapping to use. Bands not specified will be removed from the returned
         lists.
-    metadata :
+    metadata : pd.DataFrame
         The curves from PLAsTiCC
-    curves :
+    curves :pd.DataFrame
         The light curve data from PLAsTiCC
-    curves :
-        pd.DataFrame:
-    metadata :
-        pd.DataFrame:
-    bands :
-        dict:  (Default value = None)
-    classes :
-        dict:  (Default value = None) -> (list)
-    list :
-        returns: light_list: a list of light curve tuples that RAPID takes as input
-    curves: pd.DataFrame :
-        
-    metadata: pd.DataFrame :
-        
-    bands: dict :
-         (Default value = None)
-    classes: dict :
-         (Default value = None) -> (list)
-
     Returns
     -------
-    type
-        light_list: a list of light curve tuples that RAPID takes as input
+    list
+        a list of light curve tuples that RAPID takes as input
+    list
+        a list of true classes for each curve.
 
     """
-    if bands is None:
-        bands = {1: 'g', 2: 'r'}
     if classes is None:
         classes = class_map
     curves = _remove_unused_bands(curves, bands)

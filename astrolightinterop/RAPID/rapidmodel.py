@@ -22,106 +22,75 @@ class RAPIDModel:
     """Wrapper for the model outlined by the RAPID paper (Muthukrishna et al 2019)"""
     def __init__(self, curves: pd.DataFrame, metadata: pd.DataFrame, model: str = None):
         """
-
+        Creates a new instance of RAPID
         Parameters
         ----------
-        curves: pd.Dataframe
+        curves: pd.DataFrame
+            The transient data to be loaded
 
-        metadata
-        model
+        metadata: pd.DataFrame
+            The metadata for the curves
+        model: str, optional
+            The filepath of the model to be loaded, if any.
         """
         if model is not None:
             self.classifier = Classify(known_redshift=True, model_filepath=model)
         else:
             self.classifier = Classify(known_redshift=True)
-        try:
-            self._curves = curves
-            self._metadata = metadata
-        except NameError:
-            print("missing a filetype")
-            raise NameError
+        assert isinstance(curves, pd.DataFrame)
+        assert isinstance(metadata, pd.DataFrame)
+        self._curves = curves
+        self._metadata = metadata
 
     def set_metadata(self, metadata: pd.DataFrame):
-        """Sets the loaded
+        """Sets the loaded metadata
 
         Parameters
         ----------
         metadata: pd.DataFrame :
-            
-
-        Returns
-        -------
-
+            The new metadata to be loaded
         
         """
         assert isinstance(metadata, pd.DataFrame)
         self._metadata = metadata
 
     def set_curves(self, curves: pd.DataFrame):
-        """
+        """Sets the loaded transient data
 
         Parameters
         ----------
         curves: pd.DataFrame :
-            
-
-        Returns
-        -------
-
+            The new transient data to be loaded
         """
         assert isinstance(curves, pd.DataFrame)
         self._curves = curves
 
     def set_data(self, curves: pd.DataFrame, metadata: pd.DataFrame):
-        """
+        """Set both the transient data and the metadata
 
         Parameters
         ----------
         curves: pd.DataFrame :
-            
+            The new transient data to be loaded
         metadata: pd.DataFrame :
-            
-
-        Returns
-        -------
-
+            The new metadata to be loaded
         """
-        assert isinstance(curves, pd.DataFrame)
-        assert isinstance(metadata, pd.DataFrame)
-        self._curves = curves
-        self._metadata = metadata
+        self.set_curves(curves)
+        self.set_metadata(metadata)
 
     def _get_custom_data(self, class_num, data_dir, save_dir, passbands, known_redshift, nprocesses,
                          redo):
-        """
-
-        Parameters
-        ----------
-        class_num :
-            
-        data_dir :
-            
-        save_dir :
-            
-        passbands :
-            
-        known_redshift :
-            
-        nprocesses :
-            
-        redo :
-            
-
-        Returns
-        -------
-
+        """Function for traning purposes.
+        Notes
+        -----
+        See astrorapid for API usage.
         """
         light_list, target_list = p2r.convert(self._curves, self._metadata)
         # now we need to preprocess
         return read_multiple_light_curves(light_list)
 
     def train(self):
-        """ """
+        """Train the model on the loaded data."""
         # we need to create a new model
         pass
 
@@ -132,14 +101,14 @@ class RAPIDModel:
         ----------
         return_probabilities : bool, optional
             If the predictions should be a probability of arrays as opposed to the most likely class
-        return_probabilities: bool :
-             (Default value = False) -> (list)
-        list :
-            
 
         Returns
         -------
-
+        list
+            A list of true classes, ordered.
+        list
+            A list of predictions, ordered. Either the most likely or the full range of predictions
+            depending on parameters.
         
         """
         logger.info("testing model")
