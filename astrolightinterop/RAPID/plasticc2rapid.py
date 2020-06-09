@@ -21,12 +21,12 @@ def _remap_class_values(curves: pd.DataFrame, metadata: pd.DataFrame, classes=No
 
     Parameters
     ----------
-    classes : dict, optional
-        The dictionary to use for mapping in {orig:result} form.
-    metadata : pd.DataFrame
-       The metadata associated with the curve
     curves : pd.DataFrame
         The curve data associated with each transient.
+    metadata : pd.DataFrame
+       The metadata associated with the curve
+    classes : dict, optional
+        The dictionary to use for mapping in {orig:result} form.
 
     Returns
     -------
@@ -92,11 +92,11 @@ def _calculate_triggers(curve: pd.DataFrame) -> pd.DataFrame:
     """
     # map the detected column values (0,1) to the expected photflag values (0,4096, 6144)
     curve['detected'] = curve['detected'].map({0: 0, 1: 4096})
-    # get the triggerpoint.
+    # get the trigger point.
     # we are assuming that it is mjd sorted. (it should be)
     first_detect_index = curve['detected'].idxmax()
     # idxmax returns the index of the first occurrence of the max value
-    # which in this case is the first occurance of 4096.
+    # which in this case is the first occurrence of 4096.
     curve.at[first_detect_index, 'detected'] = 6144
     return curve
 
@@ -107,16 +107,21 @@ def convert(curves: pd.DataFrame, metadata: pd.DataFrame, bands: dict = None,
 
     Parameters
     ----------
-    classes : dict, optional
-        The class map to use. This will specify what classes are included and their new
-        values.
+
+    curves :pd.DataFrame
+        The light curve data from PLAsTiCC
+
+    metadata : pd.DataFrame
+        The curves from PLAsTiCC
+
     bands : dict, optional
         The band mapping to use. Bands not specified will be removed from the returned
         lists.
-    metadata : pd.DataFrame
-        The curves from PLAsTiCC
-    curves :pd.DataFrame
-        The light curve data from PLAsTiCC
+
+    classes : dict, optional
+        The class map to use. This will specify what classes are included and their new
+        values.
+
     Returns
     -------
     list
