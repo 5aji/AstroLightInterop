@@ -2,10 +2,7 @@
 
 """
 import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.preprocessing import normalize
-from sklearn.metrics import confusion_matrix
 from astrorapid.classify import Classify
 from astrorapid.process_light_curves import read_multiple_light_curves
 import logging
