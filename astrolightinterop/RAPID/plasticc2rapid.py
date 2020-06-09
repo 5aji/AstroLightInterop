@@ -15,7 +15,7 @@ band_map = {0: 'u', 1: 'g', 2: 'r', 3: 'i', 4: 'z', 5: 'Y'}
 logger = logging.getLogger(__name__)
 
 
-def _remap_class_values(metadata: pd.DataFrame, curves: pd.DataFrame, classes=None) -> \
+def _remap_class_values(curves: pd.DataFrame, metadata: pd.DataFrame, classes=None) -> \
         (pd.DataFrame, pd.DataFrame):
     """Maps class values and removes unused classes from the dataset.
 
@@ -128,7 +128,7 @@ def convert(curves: pd.DataFrame, metadata: pd.DataFrame, bands: dict = None,
     if classes is None:
         classes = class_map
     curves = _remove_unused_bands(curves, bands)
-    metadata, curves = _remap_class_values(metadata, curves, classes)
+    metadata, curves = _remap_class_values(curves, metadata, classes)
 
     light_list = []
     target_list = []
