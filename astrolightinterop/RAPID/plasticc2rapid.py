@@ -1,6 +1,8 @@
 # Converts PLAsTiCC data to a format digestible by RAPID.
 
 import time
+from typing import Tuple
+
 import pandas as pd
 import logging
 
@@ -16,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 def _remap_class_values(curves: pd.DataFrame, metadata: pd.DataFrame, classes=None) -> \
-        (pd.DataFrame, pd.DataFrame):
+        Tuple[pd.DataFrame, pd.DataFrame]:
     """Maps class values and removes unused classes from the dataset.
 
     Parameters
@@ -102,7 +104,7 @@ def _calculate_triggers(curve: pd.DataFrame) -> pd.DataFrame:
 
 
 def convert(curves: pd.DataFrame, metadata: pd.DataFrame, bands: dict = None,
-            classes: dict = None):
+            classes: dict = None) -> Tuple[list, list]:
     """Converts the PLAsTiCC dataset into a set that RAPID can use natively.
 
     Parameters
