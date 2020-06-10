@@ -19,6 +19,7 @@ class_names = (
 
 class RAPIDModel:
     """Wrapper for the model outlined by the RAPID paper (Muthukrishna et al 2019)"""
+
     def __init__(self, curves: pd.DataFrame, metadata: pd.DataFrame, model: str = None):
         """
         Creates a new instance of RAPID
@@ -93,25 +94,30 @@ class RAPIDModel:
         # we need to create a new model
         pass
 
-    def test(self, return_probabilities: bool = False) -> (list, list):
+    def test(self, curves: pd.DataFrame, metadata: pd.DataFrame, return_probabilities: bool =
+        False) -> (list, list):
         """Tests the model on the currently loaded data.
 
         Parameters
         ----------
+        curves : pd.DataFrame
+            The transient data for each object.
+        metadata : pd.DataFrame
+            The metadata for each object.
         return_probabilities : bool, optional
             If the predictions should be a probability of arrays as opposed to the most likely class
 
         Returns
         -------
-        list
+        target_list : list of int
             A list of true classes, ordered.
-        list
-            A list of predictions, ordered. Either the most likely or the full range of predictions
-            depending on parameters.
+        predictions_list : list of int or list of list of int
+            A list of predictions, ordered. Depending on the value of `return_probabilities`,
+            can either be an int
         
         """
         logger.info("testing model")
-        light_list, target_list = p2r.convert(self._curves, self._metadata)
+        light_list, target_list = p2r.convert(curves, metadata)
         predictions, steps = self.classifier.get_predictions(light_list)
         assert len(target_list) == len(predictions)
         target_list = np.add(target_list, 1)
