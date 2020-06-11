@@ -20,16 +20,11 @@ class_names = (
 class RAPIDModel:
     """Wrapper for the model outlined by the RAPID paper (Muthukrishna et al 2019)"""
 
-    def __init__(self, curves: pd.DataFrame, metadata: pd.DataFrame, model: str = None):
+    def __init__(self, model: str = None):
         """
         Creates a new instance of RAPID
         Parameters
         ----------
-        curves: pd.DataFrame
-            The transient data to be loaded
-
-        metadata: pd.DataFrame
-            The metadata for the curves
         model: str, optional
             The filepath of the model to be loaded, if any.
         """
@@ -37,10 +32,6 @@ class RAPIDModel:
             self.classifier = Classify(known_redshift=True, model_filepath=model)
         else:
             self.classifier = Classify(known_redshift=True)
-        assert isinstance(curves, pd.DataFrame)
-        assert isinstance(metadata, pd.DataFrame)
-        self._curves = curves
-        self._metadata = metadata
 
     def set_metadata(self, metadata: pd.DataFrame):
         """Sets the loaded metadata
