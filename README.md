@@ -13,7 +13,7 @@ These modify datasets to fit a different format for other models.
 | PLAsTiCC   | yes          | ---             | planned |
 | SPCC       | via PLAsTiCC | planned         | via PLAsTiCC |
 | SuperNNova | via PLAsTiCC | planned         | via PLAsTiCC |
-|          |              |                 |
+| ZTF        | via PLAsTiCC | planned         | via PLAsTiCC |
 
 #### Usage
 TODO
