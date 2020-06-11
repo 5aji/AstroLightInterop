@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 from astrorapid.classify import Classify
 from astrorapid.process_light_curves import read_multiple_light_curves
+from astrorapid.custom_classifier import create_custom_classifier
 import logging
 import astrolightinterop.RAPID.plasticc2rapid as p2r
 
@@ -80,13 +81,54 @@ class RAPIDModel:
         # now we need to preprocess
         return read_multiple_light_curves(light_list)
 
-    def train(self):
-        """Train the model on the loaded data."""
-        # we need to create a new model
+    def train(self, curves: pd.DataFrame, metadata: pd.DataFrame, *,
+              class_map: dict = p2r.class_map,
+              band_map: dict = p2r.band_map,
+              save_path: str = "models/",
+              file_name: str = None,
+              load_model: bool = False):
+        """Train the model on the loaded data.
+
+        Parameters
+        ----------
+        curves : pd.DataFrame
+            The curve data to train on.
+        metadata : pd.DataFrame
+            The metadata for each curve.
+        class_map : dict, optional
+            The class mapping from PLAsTiCC to the model.
+        band_map : dict, optional
+            The bands and their mapping from PLAsTiCC to models.
+        save_path : str, optional
+            Where the model should be saved. Default "models/"
+        file_name : str, optional
+            Override the filename of the model. Defaults to RAPIDModel_yyyy_mm_dd_hh_mm_ss.hdf5
+        load_model : bool, optional
+            Whether the model should be loaded into the class after training. Default False.
+        """
+
+        # we need to create a new model and replace the classifier with it.
+        # use currying to return a function.
+        def _get_data(class_num, data_dir, save_dir, passbands, known_redshift, nprocesses, redo, calculate_t0):
+            # This is a function RAPID needs to call to get the data.
+            # get the class num tuple
+            class_map = {key: value for (key, value) in p2r.class_map.items() if value is class_num}
+            band_map = {key: value for (key, value) in p2r.band_map.items() if key in passbands}
+            light_list, target_list = p2r.convert(curves, metadata, classes=class_map, bands=band_map)
+            # now we need to preprocess
+            return read_multiple_light_curves(light_list)
+
+        #
+        create_custom_classifier(
+            get_data_func=_get_data,
+            data_dir='data/',
+            class_nums=tuple(class_map.values()),
+            passbands=tuple(band_map.keys()),
+            save_dir=save_path,
+        )
         pass
 
-    def test(self, curves: pd.DataFrame, metadata: pd.DataFrame, return_probabilities: bool =
-        False) -> (list, list):
+    def test(self, curves: pd.DataFrame, metadata: pd.DataFrame, return_probabilities: bool = False) -> (list, list):
         """Tests the model on the currently loaded data.
 
         Parameters
