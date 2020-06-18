@@ -6,3 +6,4 @@ tensorflow-gpu~=1.15.3
 Keras~=2.3.1
 scikit-learn~=0.23.1
 astrorapid~=0.2.11
+seaborn~=0.10.1
