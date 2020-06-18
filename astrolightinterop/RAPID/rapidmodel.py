@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 from astrorapid.classify import Classify
 from astrorapid.process_light_curves import read_multiple_light_curves
+from astrorapid.custom_classifier import create_custom_classifier
 import logging
 import astrolightinterop.RAPID.plasticc2rapid as p2r
 
@@ -19,16 +20,12 @@ class_names = (
 
 class RAPIDModel:
     """Wrapper for the model outlined by the RAPID paper (Muthukrishna et al 2019)"""
-    def __init__(self, curves: pd.DataFrame, metadata: pd.DataFrame, model: str = None):
+
+    def __init__(self, model: str = None):
         """
         Creates a new instance of RAPID
         Parameters
         ----------
-        curves: pd.DataFrame
-            The transient data to be loaded
-
-        metadata: pd.DataFrame
-            The metadata for the curves
         model: str, optional
             The filepath of the model to be loaded, if any.
         """
@@ -36,10 +33,6 @@ class RAPIDModel:
             self.classifier = Classify(known_redshift=True, model_filepath=model)
         else:
             self.classifier = Classify(known_redshift=True)
-        assert isinstance(curves, pd.DataFrame)
-        assert isinstance(metadata, pd.DataFrame)
-        self._curves = curves
-        self._metadata = metadata
 
     def set_metadata(self, metadata: pd.DataFrame):
         """Sets the loaded metadata
@@ -88,30 +81,76 @@ class RAPIDModel:
         # now we need to preprocess
         return read_multiple_light_curves(light_list)
 
-    def train(self):
-        """Train the model on the loaded data."""
-        # we need to create a new model
+    def train(self, curves: pd.DataFrame, metadata: pd.DataFrame, *,
+              class_map: dict = p2r.class_map,
+              band_map: dict = p2r.band_map,
+              save_path: str = "models/",
+              file_name: str = None,
+              load_model: bool = False):
+        """Train the model on the loaded data.
+
+        Parameters
+        ----------
+        curves : pd.DataFrame
+            The curve data to train on.
+        metadata : pd.DataFrame
+            The metadata for each curve.
+        class_map : dict, optional
+            The class mapping from PLAsTiCC to the model.
+        band_map : dict, optional
+            The bands and their mapping from PLAsTiCC to models.
+        save_path : str, optional
+            Where the model should be saved. Default "models/"
+        file_name : str, optional
+            Override the filename of the model. Defaults to RAPIDModel_yyyy_mm_dd_hh_mm_ss.hdf5
+        load_model : bool, optional
+            Whether the model should be loaded into the class after training. Default False.
+        """
+
+        # we need to create a new model and replace the classifier with it.
+        # use currying to return a function.
+        def _get_data(class_num, data_dir, save_dir, passbands, known_redshift, nprocesses, redo, calculate_t0):
+            # This is a function RAPID needs to call to get the data.
+            # get the class num tuple
+            class_map = {key: value for (key, value) in p2r.class_map.items() if value is class_num}
+            band_map = {key: value for (key, value) in p2r.band_map.items() if key in passbands}
+            light_list, target_list = p2r.convert(curves, metadata, classes=class_map, bands=band_map)
+            # now we need to preprocess
+            return read_multiple_light_curves(light_list)
+
+        #
+        create_custom_classifier(
+            get_data_func=_get_data,
+            data_dir='data/',
+            class_nums=tuple(class_map.values()),
+            passbands=tuple(band_map.keys()),
+            save_dir=save_path,
+        )
         pass
 
-    def test(self, return_probabilities: bool = False) -> (list, list):
+    def test(self, curves: pd.DataFrame, metadata: pd.DataFrame, return_probabilities: bool = False) -> (list, list):
         """Tests the model on the currently loaded data.
 
         Parameters
         ----------
+        curves : pd.DataFrame
+            The transient data for each object.
+        metadata : pd.DataFrame
+            The metadata for each object.
         return_probabilities : bool, optional
             If the predictions should be a probability of arrays as opposed to the most likely class
 
         Returns
         -------
-        list
+        target_list : list of int
             A list of true classes, ordered.
-        list
-            A list of predictions, ordered. Either the most likely or the full range of predictions
-            depending on parameters.
+        predictions_list : list of int or list of list of int
+            A list of predictions, ordered. Depending on the value of `return_probabilities`,
+            can either be an int
         
         """
         logger.info("testing model")
-        light_list, target_list = p2r.convert(self._curves, self._metadata)
+        light_list, target_list = p2r.convert(curves, metadata)
         predictions, steps = self.classifier.get_predictions(light_list)
         assert len(target_list) == len(predictions)
         target_list = np.add(target_list, 1)

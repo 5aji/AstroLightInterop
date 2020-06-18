@@ -130,6 +130,8 @@ def convert(curves: pd.DataFrame, metadata: pd.DataFrame, bands: dict = None,
     """
     if classes is None:
         classes = class_map
+    if bands is None:
+        bands = band_map
     curves = _remove_unused_bands(curves, bands)
     metadata, curves = _remap_class_values(curves, metadata, classes)
 
